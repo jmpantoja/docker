@@ -26,6 +26,7 @@ RUN apt update \
 		git \
 		libssl-dev \
 		wget \
+		gnupg2 \	
 		unzip \
 		libmagickwand-dev \
 		rclone \
@@ -49,12 +50,26 @@ RUN pecl install \
 	imagick \
 	raphf \
 	propro \
+	xdebug \
 	&& printf "\n" | \
 	docker-php-ext-enable imagick \
 	raphf \
 	propro \
+	xdebug \
 	&& pecl clear-cache \
     ;
+    
+
+
+# Install Blackfire CLI tool and PHP Probe
+RUN wget -q -O - https://packages.blackfire.io/gpg.key | apt-key add -
+RUN echo "deb http://packages.blackfire.io/debian any main" | tee /etc/apt/sources.list.d/blackfire.list
+RUN apt-get update && apt-get install -y blackfire-agent blackfire-php
+
+
+RUN mkdir -p /usr/local/etc/php/conf.d/disabled
+RUN rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+COPY docker/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/disabled/docker-php-ext-xdebug.ini
 
 
 COPY docker/conf.d/api-platform.ini $PHP_INI_DIR/conf.d/api-platform.ini
@@ -68,6 +83,7 @@ ENV PATH="${PATH}:/root/.composer/vendor/bin"
 RUN set -eux; \
 	composer global require "hirak/prestissimo:^0.3" --prefer-dist --no-progress --no-suggest --classmap-authoritative; \
 	composer clear-cache
+
 
 WORKDIR /srv/app
 #USER www-data

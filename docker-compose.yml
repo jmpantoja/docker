@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   php:
-    image: jmpantoja/php:7.4.6
+    image: jmpantoja/php7.4.6:1.2
     build:
       context: ./php
 

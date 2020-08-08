@@ -10,3 +10,4 @@ Incluye:
 * imagick
 * rclone
 * cron
+* blakfire
